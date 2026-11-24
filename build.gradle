@@ -1,0 +1,60 @@
+plugins {
+	id 'org.springframework.boot' version '4.2.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'java'
+}
+
+group = 'com.backend.demox'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+// Build with JDK 25 but keep the produced bytecode compatible with Java 17.
+tasks.withType(JavaCompile).configureEach {
+	options.release = 17
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	cxfVersion = "4.2.4"
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-activemq'
+	// Required for the embedded ActiveMQ broker (Boot's starter is client-only)
+	implementation 'org.apache.activemq:activemq-broker'
+
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.1'
+
+	// The application code uses Jackson 2 directly; Spring Boot 4 uses Jackson 3 by default.
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.google.code.gson:gson'
+
+	// cxf
+	implementation "org.apache.cxf:cxf-rt-transports-http:$cxfVersion"
+	implementation "org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion"
+	implementation "org.apache.cxf:cxf-rt-databinding-aegis:$cxfVersion"
+	implementation "org.apache.cxf:cxf-spring-boot-autoconfigure:$cxfVersion"
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	// The project currently has no active tests.
+	failOnNoDiscoveredTests = false
+}
