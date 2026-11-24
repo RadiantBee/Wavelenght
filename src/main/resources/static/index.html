@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title od Home Page</title>
+
+    <script>
+
+    function ff() {
+      var data = JSON.stringify({"idEl":2,"nameEl":"TWO","sizeEl":2020});
+
+    var xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        xhr.addEventListener("readystatechange", function() {
+        if(this.readyState === 4) {
+         console.log(this.responseText);
+         var element = document.getElementById("pole11");
+         element.innerHTML =  this.responseText;
+        }
+    });
+
+xhr.open("GET", "http://localhost:8099/demox/elements/1");
+xhr.setRequestHeader("Content-Type", "application/json");
+
+xhr.send(data);
+}
+
+    </script>
+</head>
+<body>
+Hello myall
+<a href="pages/page01.html">Go to page 01</a>
+
+<button onclick="ff()">Click Me</button>
+<div id="pole11">Placeholder</div>
+</body>
+</html>
