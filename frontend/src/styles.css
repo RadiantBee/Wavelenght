@@ -1,0 +1,15 @@
+body {
+  margin: 2rem;
+  font-family: sans-serif;
+  line-height: 1.5;
+}
+
+nav {
+  margin-bottom: 1rem;
+}
+
+pre {
+  padding: 1rem;
+  background: #f4f4f4;
+  overflow-x: auto;
+}

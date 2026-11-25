@@ -4,7 +4,7 @@ plugins {
 	id 'java'
 }
 
-group = 'com.backend.demox'
+group = 'com.backend.wavelenght'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -24,6 +24,51 @@ repositories {
 
 ext {
 	cxfVersion = "4.2.4"
+}
+
+// ---------------------------------------------------------------------------
+// Frontend (React + Vite)
+//
+// `./gradlew build` installs the npm dependencies, builds the React app and
+// packages the result into the Spring Boot jar. Node.js 18+ and npm are
+// required on the machine running the build.
+// ---------------------------------------------------------------------------
+def frontendDir = file("$projectDir/frontend")
+def npmExecutable = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
+
+tasks.register('npmInstall', Exec) {
+	group = 'frontend'
+	description = 'Install frontend dependencies with npm.'
+	workingDir frontendDir
+	inputs.files(
+			new File(frontendDir, 'package.json'),
+			new File(frontendDir, 'package-lock.json')
+	)
+	outputs.dir(new File(frontendDir, 'node_modules'))
+	commandLine npmExecutable, 'ci', '--no-audit', '--no-fund'
+}
+
+tasks.register('npmBuild', Exec) {
+	group = 'frontend'
+	description = 'Build the React frontend with Vite.'
+	dependsOn tasks.named('npmInstall')
+	workingDir frontendDir
+	inputs.dir(new File(frontendDir, 'src'))
+	inputs.files(
+			new File(frontendDir, 'index.html'),
+			new File(frontendDir, 'vite.config.js'),
+			new File(frontendDir, 'package.json'),
+			new File(frontendDir, 'package-lock.json')
+	)
+	outputs.dir(layout.buildDirectory.dir('frontend'))
+	commandLine npmExecutable, 'run', 'build'
+}
+
+// Serve the generated frontend from the Spring Boot static resources.
+sourceSets.main.resources.srcDir(layout.buildDirectory.dir('frontend'))
+
+tasks.named('processResources') {
+	dependsOn tasks.named('npmBuild')
 }
 
 dependencies {

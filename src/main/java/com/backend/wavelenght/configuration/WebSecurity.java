@@ -1,0 +1,31 @@
+package com.backend.wavelenght.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+public class WebSecurity {
+
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+
+        http
+                .cors(withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                        // React assets are public; the API below still requires authentication.
+                        .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico", "/error").permitAll()
+                        .requestMatchers("/clients/**").hasRole("manager2")
+                        .anyRequest().authenticated())
+                .formLogin(withDefaults());
+        return http.build();
+    }
+}
